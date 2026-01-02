@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
@@ -28,7 +28,7 @@ api_router = APIRouter(prefix="/api")
 
 # Define Models
 class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+    model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_name: str
@@ -37,17 +37,47 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# Dashboard Metrics Model
+class DashboardMetrics(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    analyses: int = 12
+    analyses_today: int = 3
+    errors: int = 47
+    errors_today: int = 8
+    response_time: float = 1.2
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+# Tool Model
+class Tool(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str
+    name: str
+    description: str
+    icon: str
+    color: str
+    available: bool = True
+
+# User Model
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    avatar: str
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "AI Assistant Dashboard API"}
 
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.model_dump()
     status_obj = StatusCheck(**status_dict)
     
-    # Convert to dict and serialize datetime to ISO string for MongoDB
     doc = status_obj.model_dump()
     doc['timestamp'] = doc['timestamp'].isoformat()
     
@@ -56,15 +86,81 @@ async def create_status_check(input: StatusCheckCreate):
 
 @api_router.get("/status", response_model=List[StatusCheck])
 async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
     status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
     
-    # Convert ISO string timestamps back to datetime objects
     for check in status_checks:
         if isinstance(check['timestamp'], str):
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+# Dashboard API endpoints
+@api_router.get("/dashboard/metrics", response_model=DashboardMetrics)
+async def get_dashboard_metrics():
+    """Get dashboard metrics"""
+    # Try to get from database or return default values
+    metrics = await db.dashboard_metrics.find_one({}, {"_id": 0})
+    
+    if metrics:
+        if isinstance(metrics.get('updated_at'), str):
+            metrics['updated_at'] = datetime.fromisoformat(metrics['updated_at'])
+        return metrics
+    
+    # Return default metrics if none exist
+    default_metrics = DashboardMetrics()
+    return default_metrics
+
+@api_router.get("/dashboard/user", response_model=User)
+async def get_current_user():
+    """Get current user information"""
+    return User(
+        id="user-1",
+        name="Rodzigor",
+        avatar="https://api.dicebear.com/7.x/avataaars/svg?seed=Rodzigor&backgroundColor=b6e3f4"
+    )
+
+@api_router.get("/dashboard/tools", response_model=List[Tool])
+async def get_available_tools():
+    """Get list of available tools"""
+    tools = [
+        Tool(
+            id="tool-1",
+            name="Correções de uso único",
+            description="Transforme logs de erros complexos em prompts de correção claros instantaneamente.",
+            icon="wand",
+            color="purple",
+            available=True
+        ),
+        Tool(
+            id="tool-2",
+            name="Laboratório de Design",
+            description="Crie interfaces digitais completas usando IA. Landing pages, componentes e telas de app.",
+            icon="star",
+            color="red",
+            available=True
+        ),
+        Tool(
+            id="tool-3",
+            name="Análise de Código Profunda",
+            description="Identifique e corrija vulnerabilidades em tempo real.",
+            icon="brain",
+            color="blue",
+            available=True
+        )
+    ]
+    return tools
+
+@api_router.post("/dashboard/tool/{tool_id}/open")
+async def open_tool(tool_id: str):
+    """Record tool opening event"""
+    tool_event = {
+        "id": str(uuid.uuid4()),
+        "tool_id": tool_id,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "action": "open"
+    }
+    await db.tool_events.insert_one(tool_event)
+    return {"success": True, "message": f"Tool {tool_id} opened"}
 
 # Include the router in the main app
 app.include_router(api_router)
