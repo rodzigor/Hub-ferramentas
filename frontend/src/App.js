@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
-import { Zap, AlertTriangle, Clock, Sparkles, Star, Brain, Settings } from "lucide-react";
+import { Zap, AlertTriangle, Clock, Sparkles, Star, Settings } from "lucide-react";
+import NeuralBackground from "@/components/NeuralBackground";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
