@@ -6,16 +6,14 @@ import {
   Droplet, 
   Plus, 
   Sparkles, 
-  Clock, 
-  Settings, 
-  User,
+  Settings,
   Clipboard,
   Info,
   ArrowLeft
 } from 'lucide-react';
 
 // Input Screen - Translate Logs to One-Shot Fixes
-const ErrorLogInput = ({ onGenerate, onBack }) => {
+const ErrorLogInput = ({ onGenerate, onBack, user }) => {
   const [errorLog, setErrorLog] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
 
@@ -63,49 +61,31 @@ const ErrorLogInput = ({ onGenerate, onBack }) => {
         }}
       />
       
-      {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
+      {/* Header - Same as Dashboard */}
+      <header className="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
+        <div className="flex items-center gap-4">
           <button 
             onClick={onBack}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            title="Voltar ao Dashboard"
           >
             <ArrowLeft className="w-5 h-5 text-white/60" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">L</span>
-            </div>
-            <span className="text-white font-medium">Lasy Assistant Hub</span>
-          </div>
+          {user && (
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-12 h-12 rounded-full border-2 border-white/10"
+            />
+          )}
         </div>
-        
-        {/* Tabs */}
-        <div className="flex items-center gap-1 bg-white/5 rounded-full p-1">
-          <button className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-full">
-            Lasy
-          </button>
-          <button className="px-4 py-1.5 text-white/60 text-sm font-medium rounded-full hover:text-white transition-colors">
-            Lovable
-          </button>
-        </div>
-        
-        {/* Right Icons */}
-        <div className="flex items-center gap-3">
-          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-            <Clock className="w-5 h-5 text-white/60" />
-          </button>
-          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-            <Settings className="w-5 h-5 text-white/60" />
-          </button>
-          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-            <User className="w-5 h-5 text-white/60" />
-          </button>
-        </div>
+        <button className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+          <Settings className="w-6 h-6 text-white/60" />
+        </button>
       </header>
 
       {/* Main Content */}
-      <main className="relative z-10 max-w-4xl mx-auto px-6 py-16">
+      <main className="relative z-10 max-w-4xl mx-auto px-6 py-8">
         {/* Hero Title */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
