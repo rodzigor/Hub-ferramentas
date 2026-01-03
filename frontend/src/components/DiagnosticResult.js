@@ -12,6 +12,7 @@ import {
   Pencil,
   ArrowLeft
 } from 'lucide-react';
+import NeuralBackground from "@/components/NeuralBackground";
 
 // Diagnostic Result Screen
 const DiagnosticResult = ({ errorData, onNewAnalysis, onBack, user, onOpenProfile }) => {
