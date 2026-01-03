@@ -248,12 +248,8 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="mt-16 text-center">
-          <p className="text-white/40 text-sm">
-            Feito com <span className="font-semibold text-white/60">Emergent</span>
-          </p>
-        </footer>
+        {/* Spacer */}
+        <div className="mt-8"></div>
       </div>
     </div>
   );
