@@ -12,6 +12,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import NeuralBackground from "@/components/NeuralBackground";
 
 // Input Screen - One-Shot Fixes
 const ErrorLogInput = ({ onGenerate, onBack, user, onOpenProfile }) => {
