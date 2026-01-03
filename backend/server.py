@@ -138,14 +138,6 @@ async def get_available_tools():
             icon="star",
             color="red",
             available=True
-        ),
-        Tool(
-            id="tool-3",
-            name="Análise de Código Profunda",
-            description="Identifique e corrija vulnerabilidades em tempo real.",
-            icon="brain",
-            color="blue",
-            available=True
         )
     ]
     return tools
