@@ -70,7 +70,9 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
   };
 
   return (
-    <div className="min-h-screen bg-[#0d1117]">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Neural Network Animated Background */}
+      <NeuralBackground />
       {/* Header - Same as Dashboard */}
       <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-4">
