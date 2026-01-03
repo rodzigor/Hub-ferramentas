@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 // Diagnostic Result Screen
-const DiagnosticResult = ({ errorData, onNewAnalysis, onBack, user }) => {
+const DiagnosticResult = ({ errorData, onNewAnalysis, onBack, user, onOpenProfile }) => {
   const [copied, setCopied] = useState(false);
 
   // Sample data - this would come from AI processing
@@ -29,19 +29,19 @@ const DiagnosticResult = ({ errorData, onNewAnalysis, onBack, user }) => {
     rootCauseDescription: 'O erro ocorre porque o HTML gerado no servidor (SSR) difere do HTML gerado no navegador. Isso é comum ao usar dados como datas, números aleatórios ou acessar `window` diretamente no corpo do componente.',
     solution: 'O prompt gerado instrui a IA a mover a lógica não-determinística para um `useEffect`, garantindo que o servidor e o cliente inicial renderizem o mesmo conteúdo base.',
     prompt: `# Contexto e Objetivo
-You are an expert React/Next.js developer. I am encountering a "Hydration failed because the initial UI does not match what was rendered on the server" error.
+Você é um desenvolvedor expert em React/Next.js. Estou encontrando um erro "Hydration failed because the initial UI does not match what was rendered on the server".
 
 # Instruções de Correção
-Please fix this issue by ensuring deterministic rendering.
-1. Check for uses of \`window\` or \`localStorage\` during initial render.
-2. Implement a \`useEffect\` hook to handle client-side only data or use a \`dynamic import\` with ssr: false.
-3. Verify that random values (Math.random, UUIDs) are generated inside useEffect or useState, not in the component body.
+Por favor, corrija este problema garantindo renderização determinística.
+1. Verifique usos de \`window\` ou \`localStorage\` durante a renderização inicial.
+2. Implemente um hook \`useEffect\` para lidar com dados apenas do lado do cliente ou use \`dynamic import\` com ssr: false.
+3. Verifique se valores aleatórios (Math.random, UUIDs) são gerados dentro de useEffect ou useState, não no corpo do componente.
 
 # Código Problemático Detectado
-The component <DashboardHeader /> seems to render a timestamp \`new Date().toISOString()\` directly in the JSX, causing the mismatch.
+O componente <DashboardHeader /> parece renderizar um timestamp \`new Date().toISOString()\` diretamente no JSX, causando a incompatibilidade.
 
 # Formato de Saída Esperado
-Provide the corrected code block for DashboardHeader.tsx only. Do not explain the theory, just fix the code.`,
+Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não explique a teoria, apenas corrija o código.`,
     relatedAnalyses: [
       {
         id: 1,
@@ -81,11 +81,13 @@ Provide the corrected code block for DashboardHeader.tsx only. Do not explain th
             <ArrowLeft className="w-5 h-5 text-white/60" />
           </button>
           {user && (
-            <img
-              src={user.avatar}
-              alt={user.name}
-              className="w-12 h-12 rounded-full border-2 border-white/10"
-            />
+            <button onClick={onOpenProfile}>
+              <img
+                src={user.avatar}
+                alt={user.name}
+                className="w-12 h-12 rounded-full border-2 border-white/10 hover:border-purple-500/50 transition-colors cursor-pointer"
+              />
+            </button>
           )}
         </div>
         <button className="p-2 rounded-lg hover:bg-white/5 transition-colors">
