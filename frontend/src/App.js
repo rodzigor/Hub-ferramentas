@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Zap, AlertTriangle, Clock, Sparkles, Star, Settings } from "lucide-react";
 import NeuralBackground from "@/components/NeuralBackground";
+import ErrorLogInput from "@/components/ErrorLogInput";
+import DiagnosticResult from "@/components/DiagnosticResult";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -35,8 +37,6 @@ const ToolCard = ({ tool, onOpen }) => {
         return Sparkles;
       case 'star':
         return Star;
-      case 'brain':
-        return Brain;
       default:
         return Sparkles;
     }
@@ -114,6 +114,7 @@ const ToolCard = ({ tool, onOpen }) => {
 
 // Dashboard Component
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [metrics, setMetrics] = useState(null);
   const [user, setUser] = useState(null);
   const [tools, setTools] = useState([]);
@@ -144,7 +145,10 @@ const Dashboard = () => {
   const handleOpenTool = async (toolId) => {
     try {
       await axios.post(`${API}/dashboard/tool/${toolId}/open`);
-      alert(`Ferramenta aberta: ${toolId}`);
+      // Navigate to the tool page
+      if (toolId === 'tool-1') {
+        navigate('/correcoes');
+      }
     } catch (e) {
       console.error("Error opening tool:", e);
     }
@@ -239,7 +243,7 @@ const Dashboard = () => {
           <h2 data-testid="tools-title" className="text-lg font-semibold text-white mb-4">
             Ferramentas Disponíveis
           </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {tools.map((tool) => (
               <ToolCard key={tool.id} tool={tool} onOpen={handleOpenTool} />
             ))}
@@ -253,12 +257,55 @@ const Dashboard = () => {
   );
 };
 
+// Correções Tool Page
+const CorrecoesPage = () => {
+  const navigate = useNavigate();
+  const [currentView, setCurrentView] = useState('input'); // 'input' or 'result'
+  const [errorData, setErrorData] = useState(null);
+
+  const handleGenerate = (data) => {
+    setErrorData(data);
+    setCurrentView('result');
+  };
+
+  const handleNewAnalysis = () => {
+    setErrorData(null);
+    setCurrentView('input');
+  };
+
+  const handleBack = () => {
+    if (currentView === 'result') {
+      setCurrentView('input');
+    } else {
+      navigate('/');
+    }
+  };
+
+  if (currentView === 'result') {
+    return (
+      <DiagnosticResult 
+        errorData={errorData} 
+        onNewAnalysis={handleNewAnalysis}
+        onBack={handleBack}
+      />
+    );
+  }
+
+  return (
+    <ErrorLogInput 
+      onGenerate={handleGenerate}
+      onBack={handleBack}
+    />
+  );
+};
+
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/correcoes" element={<CorrecoesPage />} />
         </Routes>
       </BrowserRouter>
     </div>
