@@ -50,18 +50,9 @@ const ErrorLogInput = ({ onGenerate, onBack, user, onOpenProfile }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] relative">
-      {/* Grid Background */}
-      <div 
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }}
-      />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Neural Network Animated Background */}
+      <NeuralBackground />
       
       {/* Header - Same as Dashboard */}
       <header className="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
