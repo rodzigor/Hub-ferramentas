@@ -6,6 +6,7 @@ import { Zap, AlertTriangle, Clock, Sparkles, Star, Settings } from "lucide-reac
 import NeuralBackground from "@/components/NeuralBackground";
 import ErrorLogInput from "@/components/ErrorLogInput";
 import DiagnosticResult from "@/components/DiagnosticResult";
+import UserProfile from "@/components/UserProfile";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -154,6 +155,10 @@ const Dashboard = () => {
     }
   };
 
+  const handleOpenProfile = () => {
+    navigate('/perfil');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
@@ -172,12 +177,14 @@ const Dashboard = () => {
         <header className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             {user && (
-              <img
-                data-testid="user-avatar"
-                src={user.avatar}
-                alt={user.name}
-                className="w-12 h-12 rounded-full border-2 border-white/10"
-              />
+              <button onClick={handleOpenProfile}>
+                <img
+                  data-testid="user-avatar"
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-12 h-12 rounded-full border-2 border-white/10 hover:border-purple-500/50 transition-colors cursor-pointer"
+                />
+              </button>
             )}
           </div>
           <button 
@@ -294,6 +301,10 @@ const CorrecoesPage = () => {
     }
   };
 
+  const handleOpenProfile = () => {
+    navigate('/perfil');
+  };
+
   if (currentView === 'result') {
     return (
       <DiagnosticResult 
@@ -301,6 +312,7 @@ const CorrecoesPage = () => {
         onNewAnalysis={handleNewAnalysis}
         onBack={handleBack}
         user={user}
+        onOpenProfile={handleOpenProfile}
       />
     );
   }
@@ -310,6 +322,43 @@ const CorrecoesPage = () => {
       onGenerate={handleGenerate}
       onBack={handleBack}
       user={user}
+      onOpenProfile={handleOpenProfile}
+    />
+  );
+};
+
+// Profile Page
+const ProfilePage = () => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userRes = await axios.get(`${API}/dashboard/user`);
+        setUser(userRes.data);
+      } catch (e) {
+        console.error("Error fetching user:", e);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  const handleLogout = () => {
+    // Implement logout logic
+    alert('Você saiu da conta com sucesso!');
+    navigate('/');
+  };
+
+  return (
+    <UserProfile 
+      user={user}
+      onBack={handleBack}
+      onLogout={handleLogout}
     />
   );
 };
@@ -321,6 +370,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/correcoes" element={<CorrecoesPage />} />
+          <Route path="/perfil" element={<ProfilePage />} />
         </Routes>
       </BrowserRouter>
     </div>
