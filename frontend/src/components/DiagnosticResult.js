@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { 
-  Bell, 
   Settings, 
   Bookmark, 
   Plus, 
@@ -15,7 +14,7 @@ import {
 } from 'lucide-react';
 
 // Diagnostic Result Screen
-const DiagnosticResult = ({ errorData, onNewAnalysis, onBack }) => {
+const DiagnosticResult = ({ errorData, onNewAnalysis, onBack, user }) => {
   const [copied, setCopied] = useState(false);
 
   // Sample data - this would come from AI processing
@@ -71,47 +70,31 @@ Provide the corrected code block for DashboardHeader.tsx only. Do not explain th
 
   return (
     <div className="min-h-screen bg-[#0d1117]">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
+      {/* Header - Same as Dashboard */}
+      <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
+        <div className="flex items-center gap-4">
           <button 
             onClick={onBack}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors"
+            title="Voltar"
           >
             <ArrowLeft className="w-5 h-5 text-white/60" />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">L</span>
-            </div>
-            <span className="text-white font-medium">Lasy Assistant Hub</span>
-          </div>
+          {user && (
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-12 h-12 rounded-full border-2 border-white/10"
+            />
+          )}
         </div>
-        
-        {/* Navigation */}
-        <nav className="flex items-center gap-6">
-          <a href="#" className="text-white/60 hover:text-white transition-colors text-sm">Dashboard</a>
-          <a href="#" className="text-white border-b-2 border-blue-500 pb-1 text-sm">Diagnóstico</a>
-          <a href="#" className="text-white/60 hover:text-white transition-colors text-sm">Histórico</a>
-          <a href="#" className="text-white/60 hover:text-white transition-colors text-sm">Documentação</a>
-        </nav>
-        
-        {/* Right Icons */}
-        <div className="flex items-center gap-3">
-          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-            <Bell className="w-5 h-5 text-white/60" />
-          </button>
-          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-            <Settings className="w-5 h-5 text-white/60" />
-          </button>
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs font-medium">JD</span>
-          </div>
-        </div>
+        <button className="p-2 rounded-lg hover:bg-white/5 transition-colors">
+          <Settings className="w-6 h-6 text-white/60" />
+        </button>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - 2/3 */}
           <div className="lg:col-span-2 space-y-6">
@@ -153,7 +136,7 @@ Provide the corrected code block for DashboardHeader.tsx only. Do not explain th
               </div>
 
               {/* Code Block */}
-              <div className="bg-[#0d1117] p-4 font-mono text-sm overflow-x-auto">
+              <div className="bg-[#0d1117] p-4 font-mono text-sm overflow-x-auto max-h-96 overflow-y-auto">
                 <pre className="text-white/90 whitespace-pre-wrap">
                   {diagnosticData.prompt.split('\n').map((line, idx) => (
                     <div key={idx} className="flex">
@@ -296,18 +279,6 @@ Provide the corrected code block for DashboardHeader.tsx only. Do not explain th
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-white/10 px-6 py-4 mt-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <p className="text-white/40 text-sm">© 2023 Lasy Assistant Hub. Todos os direitos reservados.</p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-white/40 hover:text-white/60 text-sm transition-colors">Privacidade</a>
-            <a href="#" className="text-white/40 hover:text-white/60 text-sm transition-colors">Termos</a>
-            <a href="#" className="text-white/40 hover:text-white/60 text-sm transition-colors">Suporte</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
