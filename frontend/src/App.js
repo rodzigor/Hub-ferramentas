@@ -159,12 +159,9 @@ const Dashboard = () => {
   }
 
   return (
-    <div data-testid="dashboard" className="min-h-screen bg-[#0a0a0f] relative overflow-hidden">
-      {/* Background gradient effects */}
-      <div className="absolute top-0 right-0 w-[800px] h-[600px] pointer-events-none">
-        <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-blue-500/30 via-cyan-500/15 to-transparent blur-3xl" />
-        <div className="absolute top-20 right-20 w-[400px] h-[400px] bg-gradient-to-bl from-blue-400/20 via-purple-500/10 to-transparent rounded-full blur-2xl" />
-      </div>
+    <div data-testid="dashboard" className="min-h-screen relative overflow-hidden">
+      {/* Neural Network Animated Background */}
+      <NeuralBackground />
       
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
