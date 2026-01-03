@@ -262,6 +262,19 @@ const CorrecoesPage = () => {
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState('input'); // 'input' or 'result'
   const [errorData, setErrorData] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userRes = await axios.get(`${API}/dashboard/user`);
+        setUser(userRes.data);
+      } catch (e) {
+        console.error("Error fetching user:", e);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleGenerate = (data) => {
     setErrorData(data);
@@ -287,6 +300,7 @@ const CorrecoesPage = () => {
         errorData={errorData} 
         onNewAnalysis={handleNewAnalysis}
         onBack={handleBack}
+        user={user}
       />
     );
   }
@@ -295,6 +309,7 @@ const CorrecoesPage = () => {
     <ErrorLogInput 
       onGenerate={handleGenerate}
       onBack={handleBack}
+      user={user}
     />
   );
 };
