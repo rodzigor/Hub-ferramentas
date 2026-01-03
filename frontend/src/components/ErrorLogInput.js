@@ -170,14 +170,16 @@ ReferenceError: window is not defined
 
         {/* Generate Button */}
         <div className="flex justify-center">
-          <button
+          <ShimmerButton
             onClick={handleGenerate}
             disabled={!errorLog.trim()}
-            className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-2xl transition-all shadow-lg shadow-purple-500/20"
+            shimmerColor="#a855f7"
+            shimmerDuration="2.5s"
+            className="gap-3 text-lg font-medium"
           >
             <Sparkles className="w-5 h-5" />
             <span>Gerar One-Shot Fix</span>
-          </button>
+          </ShimmerButton>
         </div>
       </main>
 
