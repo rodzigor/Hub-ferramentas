@@ -220,25 +220,25 @@ const Dashboard = () => {
           <div className="grid grid-cols-3 gap-2 sm:gap-4">
             <MetricCard
               icon={Zap}
-              title="Análises"
-              value={metrics?.analyses || 12}
-              subtitle={`+${metrics?.analyses_today || 3} hoje`}
+              title="Correções"
+              value={metrics?.corrections || 0}
+              subtitle="One-Shot"
               colorClass="bg-gradient-to-br from-purple-900/60 to-purple-950/80 border border-purple-500/20"
               glowClass="shadow-[0_0_40px_rgba(168,85,247,0.15)]"
             />
             <MetricCard
-              icon={AlertTriangle}
-              title="Erros"
-              value={metrics?.errors || 47}
-              subtitle={`+${metrics?.errors_today || 8}`}
+              icon={Star}
+              title="Designs"
+              value={metrics?.designs || 0}
+              subtitle="Criados"
               colorClass="bg-gradient-to-br from-red-900/60 to-red-950/80 border border-red-500/20"
               glowClass="shadow-[0_0_40px_rgba(239,68,68,0.15)]"
             />
             <MetricCard
-              icon={Clock}
-              title="Tempo"
-              value={`${metrics?.response_time || 1.2}s`}
-              subtitle="Ponto"
+              icon={Bookmark}
+              title="Salvos"
+              value={metrics?.saved || 0}
+              subtitle="Histórico"
               colorClass="bg-gradient-to-br from-teal-900/60 to-teal-950/80 border border-teal-500/20"
               glowClass="shadow-[0_0_40px_rgba(20,184,166,0.15)]"
             />
