@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Zap, AlertTriangle, Clock, Sparkles, Star, Settings } from "lucide-react";
+import { Zap, Star, Bookmark, Sparkles, Settings } from "lucide-react";
 import NeuralBackground from "@/components/NeuralBackground";
 import ErrorLogInput from "@/components/ErrorLogInput";
 import DiagnosticResult from "@/components/DiagnosticResult";
