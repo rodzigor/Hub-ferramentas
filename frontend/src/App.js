@@ -11,20 +11,20 @@ import UserProfile from "@/components/UserProfile";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// MetricCard Component
+// MetricCard Component - Compact for mobile
 const MetricCard = ({ icon: Icon, title, value, subtitle, colorClass, glowClass }) => {
   return (
     <div 
       data-testid={`metric-card-${title.toLowerCase().replace(/\s+/g, '-')}`}
-      className={`relative rounded-2xl p-5 ${colorClass} ${glowClass} transition-all duration-300 hover:scale-105`}
+      className={`relative rounded-xl sm:rounded-2xl p-3 sm:p-5 ${colorClass} ${glowClass} transition-all duration-300 hover:scale-105`}
     >
-      <div className="flex items-center gap-2 mb-3">
-        <Icon className="w-5 h-5" />
-        <span className="text-sm font-medium text-white/90">{title}</span>
+      <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+        <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
+        <span className="text-xs sm:text-sm font-medium text-white/90">{title}</span>
       </div>
       <div className="flex items-end justify-between">
-        <span className="text-4xl font-bold text-white">{value}</span>
-        <span className="text-sm text-white/60">{subtitle}</span>
+        <span className="text-2xl sm:text-4xl font-bold text-white">{value}</span>
+        <span className="text-[10px] sm:text-sm text-white/60">{subtitle}</span>
       </div>
     </div>
   );
