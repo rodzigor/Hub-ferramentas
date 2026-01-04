@@ -42,11 +42,9 @@ class DashboardMetrics(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    analyses: int = 12
-    analyses_today: int = 3
-    errors: int = 47
-    errors_today: int = 8
-    response_time: float = 1.2
+    corrections: int = 0  # One-Shot Fixes gerados
+    designs: int = 0      # Designs criados no Laboratório
+    saved: int = 0        # Itens salvos no histórico
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 # Tool Model
