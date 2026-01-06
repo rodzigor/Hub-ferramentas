@@ -74,6 +74,27 @@ class User(BaseModel):
     name: str
     avatar: str
 
+# Error Analysis Request Model
+class ErrorAnalysisRequest(BaseModel):
+    error_log: str
+    tags: List[str] = []
+
+# Error Analysis Response Model
+class ErrorAnalysisResponse(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    log_id: str
+    timestamp: str
+    framework: str
+    severity: str
+    tokens_used: int
+    processing_time: str
+    root_cause: str
+    root_cause_description: str
+    solution: str
+    prompt: str
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
