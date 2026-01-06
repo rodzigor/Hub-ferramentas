@@ -230,7 +230,8 @@ TAGS DE CONTEXTO: {', '.join(request.tags) if request.tags else 'Nenhuma'}
 Retorne APENAS o JSON com a análise, sem nenhum texto adicional."""
 
         # Call OpenAI API
-        response = openai_client.chat.completions.create(
+        client = get_openai_client()
+        response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": system_prompt},
