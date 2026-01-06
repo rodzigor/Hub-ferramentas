@@ -9,13 +9,14 @@ import {
   Settings,
   Clipboard,
   Info,
-  ArrowLeft
+  ArrowLeft,
+  AlertCircle
 } from 'lucide-react';
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import NeuralBackground from "@/components/NeuralBackground";
 
 // Input Screen - One-Shot Fixes
-const ErrorLogInput = ({ onGenerate, onBack, user, onOpenProfile }) => {
+const ErrorLogInput = ({ onGenerate, onBack, user, onOpenProfile, error }) => {
   const [errorLog, setErrorLog] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
 
