@@ -253,7 +253,6 @@ Retorne APENAS o JSON com a análise, sem nenhum texto adicional."""
         if ai_response.endswith("```"):
             ai_response = ai_response[:-3]
         
-        import json
         analysis = json.loads(ai_response.strip())
         
         # Calculate processing time
