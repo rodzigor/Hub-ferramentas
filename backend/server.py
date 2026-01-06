@@ -11,7 +11,7 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 import time
-from openai import OpenAI
+from emergentintegrations.llm.chat import chat, LlmModel
 
 
 ROOT_DIR = Path(__file__).parent
