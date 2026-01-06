@@ -267,9 +267,10 @@ const Dashboard = () => {
 // Correções Tool Page
 const CorrecoesPage = () => {
   const navigate = useNavigate();
-  const [currentView, setCurrentView] = useState('input'); // 'input' or 'result'
-  const [errorData, setErrorData] = useState(null);
+  const [currentView, setCurrentView] = useState('input'); // 'input', 'loading', or 'result'
+  const [analysisResult, setAnalysisResult] = useState(null);
   const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -283,13 +284,28 @@ const CorrecoesPage = () => {
     fetchUser();
   }, []);
 
-  const handleGenerate = (data) => {
-    setErrorData(data);
-    setCurrentView('result');
+  const handleGenerate = async (data) => {
+    setCurrentView('loading');
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API}/analyze-error`, {
+        error_log: data.errorLog,
+        tags: data.tags
+      });
+      
+      setAnalysisResult(response.data);
+      setCurrentView('result');
+    } catch (e) {
+      console.error("Error analyzing:", e);
+      setError(e.response?.data?.detail || "Erro ao analisar. Tente novamente.");
+      setCurrentView('input');
+    }
   };
 
   const handleNewAnalysis = () => {
-    setErrorData(null);
+    setAnalysisResult(null);
+    setError(null);
     setCurrentView('input');
   };
 
@@ -305,10 +321,22 @@ const CorrecoesPage = () => {
     navigate('/perfil');
   };
 
-  if (currentView === 'result') {
+  if (currentView === 'loading') {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-white text-xl">Analisando erro...</p>
+          <p className="text-white/50 mt-2">A IA está gerando o prompt perfeito</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentView === 'result' && analysisResult) {
     return (
       <DiagnosticResult 
-        errorData={errorData} 
+        analysisResult={analysisResult} 
         onNewAnalysis={handleNewAnalysis}
         onBack={handleBack}
         user={user}
@@ -323,6 +351,7 @@ const CorrecoesPage = () => {
       onBack={handleBack}
       user={user}
       onOpenProfile={handleOpenProfile}
+      error={error}
     />
   );
 };
