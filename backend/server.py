@@ -228,12 +228,15 @@ Retorne APENAS o JSON com a análise, sem nenhum texto adicional."""
 
         # Call Emergent LLM API
         api_key = get_emergent_key()
-        ai_response = await chat(
+        session_id = str(uuid.uuid4())
+        
+        llm_chat = LlmChat(
             api_key=api_key,
-            model=LlmModel.GPT_4O_MINI,
-            system_prompt=system_prompt,
-            user_prompt=user_message
-        )
+            session_id=session_id,
+            system_message=system_prompt
+        ).with_model("openai", "gpt-4o-mini")
+        
+        ai_response = await llm_chat.send_message(UserMessage(text=user_message))
         
         ai_response = ai_response.strip()
         
