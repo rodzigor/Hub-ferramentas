@@ -33,7 +33,7 @@ def get_openai_client():
             raise ValueError("EMERGENT_LLM_KEY not set")
         openai_client = OpenAI(
             api_key=api_key,
-            base_url="https://llm.emergentagi.com/v1"
+            base_url="https://api.emergentagi.com/v1"
         )
     return openai_client
 
