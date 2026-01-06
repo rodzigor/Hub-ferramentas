@@ -15,48 +15,22 @@ import {
 import NeuralBackground from "@/components/NeuralBackground";
 
 // Diagnostic Result Screen
-const DiagnosticResult = ({ errorData, onNewAnalysis, onBack, user, onOpenProfile }) => {
+const DiagnosticResult = ({ analysisResult, onNewAnalysis, onBack, user, onOpenProfile }) => {
   const [copied, setCopied] = useState(false);
 
-  // Sample data - this would come from AI processing
+  // Use real data from API
   const diagnosticData = {
-    logId: '#8291-A',
-    timestamp: '24/10/2023 14:30',
-    framework: 'Next.js 14',
-    severity: 'Média',
-    tokensUsed: 420,
-    processingTime: '1.2s',
-    rootCause: 'Hydration Mismatch',
-    rootCauseDescription: 'O erro ocorre porque o HTML gerado no servidor (SSR) difere do HTML gerado no navegador. Isso é comum ao usar dados como datas, números aleatórios ou acessar `window` diretamente no corpo do componente.',
-    solution: 'O prompt gerado instrui a IA a mover a lógica não-determinística para um `useEffect`, garantindo que o servidor e o cliente inicial renderizem o mesmo conteúdo base.',
-    prompt: `# Contexto e Objetivo
-Você é um desenvolvedor expert em React/Next.js. Estou encontrando um erro "Hydration failed because the initial UI does not match what was rendered on the server".
-
-# Instruções de Correção
-Por favor, corrija este problema garantindo renderização determinística.
-1. Verifique usos de \`window\` ou \`localStorage\` durante a renderização inicial.
-2. Implemente um hook \`useEffect\` para lidar com dados apenas do lado do cliente ou use \`dynamic import\` com ssr: false.
-3. Verifique se valores aleatórios (Math.random, UUIDs) são gerados dentro de useEffect ou useState, não no corpo do componente.
-
-# Código Problemático Detectado
-O componente <DashboardHeader /> parece renderizar um timestamp \`new Date().toISOString()\` diretamente no JSX, causando a incompatibilidade.
-
-# Formato de Saída Esperado
-Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não explique a teoria, apenas corrija o código.`,
-    relatedAnalyses: [
-      {
-        id: 1,
-        type: 'error',
-        title: 'TypeError: Cannot read properties of un...',
-        time: 'Há 2 horas'
-      },
-      {
-        id: 2,
-        type: 'warning',
-        title: 'Warning: Missing key prop in list',
-        time: 'Ontem'
-      }
-    ]
+    logId: analysisResult?.log_id || '#0000-X',
+    timestamp: analysisResult?.timestamp || new Date().toLocaleString('pt-BR'),
+    framework: analysisResult?.framework || 'Não detectado',
+    severity: analysisResult?.severity || 'Média',
+    tokensUsed: analysisResult?.tokens_used || 0,
+    processingTime: analysisResult?.processing_time || '0s',
+    rootCause: analysisResult?.root_cause || 'Erro Desconhecido',
+    rootCauseDescription: analysisResult?.root_cause_description || 'Não foi possível determinar a causa raiz.',
+    solution: analysisResult?.solution || 'Não foi possível gerar uma solução.',
+    prompt: analysisResult?.prompt || 'Não foi possível gerar o prompt.',
+    relatedAnalyses: []
   };
 
   const handleCopyPrompt = async () => {
@@ -69,12 +43,28 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
     }
   };
 
+  const getSeverityColor = (severity) => {
+    switch (severity?.toLowerCase()) {
+      case 'alta':
+        return { bg: 'bg-red-400', text: 'text-red-400' };
+      case 'média':
+        return { bg: 'bg-yellow-400', text: 'text-yellow-400' };
+      case 'baixa':
+        return { bg: 'bg-green-400', text: 'text-green-400' };
+      default:
+        return { bg: 'bg-yellow-400', text: 'text-yellow-400' };
+    }
+  };
+
+  const severityColors = getSeverityColor(diagnosticData.severity);
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Neural Network Animated Background */}
       <NeuralBackground />
+      
       {/* Header - Same as Dashboard */}
-      <header className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
+      <header className="relative z-10 flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 max-w-6xl mx-auto">
         <div className="flex items-center gap-4">
           <button 
             onClick={onBack}
@@ -99,7 +89,7 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - 2/3 */}
           <div className="lg:col-span-2 space-y-6">
@@ -119,7 +109,7 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
             </div>
 
             {/* Prompt Card */}
-            <div className="bg-[#161b22] border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-[#161b22]/80 backdrop-blur-sm border border-white/10 rounded-xl overflow-hidden">
               {/* Card Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -128,7 +118,7 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
                   </div>
                   <div>
                     <h3 className="text-white font-semibold">O Prompt Perfeito</h3>
-                    <p className="text-white/50 text-sm">Pronto para copiar e colar no Lasy/Lovable</p>
+                    <p className="text-white/50 text-sm">Pronto para copiar e colar no Lovable</p>
                   </div>
                 </div>
                 <button
@@ -141,7 +131,7 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
               </div>
 
               {/* Code Block */}
-              <div className="bg-[#0d1117] p-4 font-mono text-sm overflow-x-auto max-h-96 overflow-y-auto">
+              <div className="bg-[#0d1117]/80 p-4 font-mono text-sm overflow-x-auto max-h-96 overflow-y-auto">
                 <pre className="text-white/90 whitespace-pre-wrap">
                   {diagnosticData.prompt.split('\n').map((line, idx) => (
                     <div key={idx} className="flex">
@@ -184,7 +174,7 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
           {/* Right Column - 1/3 */}
           <div className="space-y-6">
             {/* Insight Educativo */}
-            <div className="bg-[#161b22] border border-white/10 rounded-xl p-5">
+            <div className="bg-[#161b22]/80 backdrop-blur-sm border border-white/10 rounded-xl p-5">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center">
                   <GraduationCap className="w-5 h-5 text-white" />
@@ -224,7 +214,7 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
             </div>
 
             {/* Metadados */}
-            <div className="bg-[#161b22] border border-white/10 rounded-xl p-5">
+            <div className="bg-[#161b22]/80 backdrop-blur-sm border border-white/10 rounded-xl p-5">
               <h3 className="text-white font-semibold mb-4">METADADOS DA ANÁLISE</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -237,8 +227,8 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
                 <div>
                   <p className="text-white/40 text-xs mb-1">Gravidade</p>
                   <p className="text-white flex items-center gap-2">
-                    <span className="w-2 h-2 bg-yellow-400 rounded-full"></span>
-                    <span className="text-yellow-400">{diagnosticData.severity}</span>
+                    <span className={`w-2 h-2 ${severityColors.bg} rounded-full`}></span>
+                    <span className={severityColors.text}>{diagnosticData.severity}</span>
                   </p>
                 </div>
                 <div>
@@ -249,36 +239,6 @@ Forneça o bloco de código corrigido apenas para DashboardHeader.tsx. Não expl
                   <p className="text-white/40 text-xs mb-1">Tempo de Proc.</p>
                   <p className="text-white">{diagnosticData.processingTime}</p>
                 </div>
-              </div>
-            </div>
-
-            {/* Análises Relacionadas */}
-            <div className="bg-[#161b22] border border-white/10 rounded-xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white font-semibold">Análises Relacionadas</h3>
-                <button className="text-blue-400 text-sm hover:text-blue-300 transition-colors">Ver tudo</button>
-              </div>
-              <div className="space-y-3">
-                {diagnosticData.relatedAnalyses.map((analysis) => (
-                  <div 
-                    key={analysis.id}
-                    className="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg cursor-pointer transition-colors"
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      analysis.type === 'error' ? 'bg-red-500/20' : 'bg-yellow-500/20'
-                    }`}>
-                      {analysis.type === 'error' 
-                        ? <AlertCircle className="w-4 h-4 text-red-400" />
-                        : <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                      }
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-white text-sm truncate">{analysis.title}</p>
-                      <p className="text-white/40 text-xs">{analysis.time}</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-white/30" />
-                  </div>
-                ))}
               </div>
             </div>
           </div>
