@@ -226,20 +226,16 @@ TAGS DE CONTEXTO: {', '.join(request.tags) if request.tags else 'Nenhuma'}
 
 Retorne APENAS o JSON com a análise, sem nenhum texto adicional."""
 
-        # Call OpenAI API
-        client = get_openai_client()
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message}
-            ],
-            temperature=0.7,
-            max_tokens=2000
+        # Call Emergent LLM API
+        api_key = get_emergent_key()
+        ai_response = await chat(
+            api_key=api_key,
+            model=LlmModel.GPT_4O_MINI,
+            system_prompt=system_prompt,
+            user_prompt=user_message
         )
         
-        # Parse the response
-        ai_response = response.choices[0].message.content.strip()
+        ai_response = ai_response.strip()
         
         # Remove markdown code blocks if present
         if ai_response.startswith("```"):
@@ -254,8 +250,8 @@ Retorne APENAS o JSON com a análise, sem nenhum texto adicional."""
         # Calculate processing time
         processing_time = time.time() - start_time
         
-        # Calculate tokens used
-        tokens_used = response.usage.total_tokens if response.usage else 0
+        # Estimate tokens used (rough estimate)
+        tokens_used = len(system_prompt.split()) + len(user_message.split()) + len(ai_response.split())
         
         # Generate log ID
         log_id = f"#{uuid.uuid4().hex[:4].upper()}-{chr(65 + (int(time.time()) % 26))}"
