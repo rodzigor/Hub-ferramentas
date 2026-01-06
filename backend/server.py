@@ -21,11 +21,20 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# OpenAI client with Emergent LLM Key
-openai_client = OpenAI(
-    api_key=os.environ.get('EMERGENT_LLM_KEY'),
-    base_url="https://llm.emergentagi.com/v1"
-)
+# OpenAI client with Emergent LLM Key - initialized lazily
+openai_client = None
+
+def get_openai_client():
+    global openai_client
+    if openai_client is None:
+        api_key = os.environ.get('EMERGENT_LLM_KEY')
+        if not api_key:
+            raise ValueError("EMERGENT_LLM_KEY not set")
+        openai_client = OpenAI(
+            api_key=api_key,
+            base_url="https://llm.emergentagi.com/v1"
+        )
+    return openai_client
 
 # Create the main app without a prefix
 app = FastAPI()
