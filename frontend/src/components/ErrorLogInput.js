@@ -161,6 +161,14 @@ ReferenceError: window is not defined
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <p className="text-red-400">{error}</p>
+          </div>
+        )}
+
         {/* Generate Button */}
         <div className="flex justify-center">
           <ShimmerButton
