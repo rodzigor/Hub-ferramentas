@@ -302,7 +302,7 @@ Retorne APENAS o JSON com a análise, sem nenhum texto adicional."""
         )
         
     except json.JSONDecodeError as e:
-        logger.error(f"JSON decode error: {e}")
+        logger.error(f"JSON decode error: {e}, Response: {ai_response}")
         raise HTTPException(status_code=500, detail="Erro ao processar resposta da IA")
     except Exception as e:
         logger.error(f"Error analyzing error: {e}")
