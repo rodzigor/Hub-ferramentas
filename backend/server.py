@@ -181,6 +181,122 @@ async def open_tool(tool_id: str):
     await db.tool_events.insert_one(tool_event)
     return {"success": True, "message": f"Tool {tool_id} opened"}
 
+# One-Shot Fixes - Error Analysis Endpoint
+@api_router.post("/analyze-error", response_model=ErrorAnalysisResponse)
+async def analyze_error(request: ErrorAnalysisRequest):
+    """Analyze error log and generate a perfect prompt for Lovable"""
+    start_time = time.time()
+    
+    try:
+        # System prompt for the AI to act as a Lovable expert
+        system_prompt = """Você é um especialista em desenvolvimento web e na plataforma Lovable. Sua tarefa é analisar logs de erro e gerar prompts perfeitos para corrigir erros na plataforma Lovable.
+
+Você deve retornar uma resposta em formato JSON com a seguinte estrutura EXATA (sem markdown, apenas JSON puro):
+{
+    "framework": "Nome do framework detectado (ex: React, Next.js 14, Vue.js, etc)",
+    "severity": "Baixa, Média ou Alta",
+    "root_cause": "Título curto da causa raiz (ex: Hydration Mismatch, TypeError, etc)",
+    "root_cause_description": "Explicação detalhada da causa raiz em português, explicando por que o erro ocorre. Use `código` para destacar termos técnicos.",
+    "solution": "Explicação da solução em português, descrevendo como o prompt vai resolver o problema. Use `código` para destacar termos técnicos.",
+    "prompt": "O prompt perfeito e completo para colar no Lovable. Deve ser estruturado, claro e incluir: contexto, instruções de correção numeradas, código problemático detectado e formato de saída esperado."
+}
+
+Regras importantes:
+1. O prompt gerado deve ser específico para o erro analisado
+2. Use português brasileiro para as explicações
+3. O prompt pode ser em português ou inglês (prefira inglês para melhor compatibilidade)
+4. Seja técnico mas educativo nas explicações
+5. Identifique o framework baseado no erro
+6. Avalie a gravidade baseada no impacto do erro
+7. RETORNE APENAS O JSON, SEM TEXTO ANTES OU DEPOIS"""
+
+        # User message with the error log
+        user_message = f"""Analise o seguinte log de erro e gere um diagnóstico completo:
+
+LOG DE ERRO:
+{request.error_log}
+
+TAGS DE CONTEXTO: {', '.join(request.tags) if request.tags else 'Nenhuma'}
+
+Retorne APENAS o JSON com a análise, sem nenhum texto adicional."""
+
+        # Call OpenAI API
+        response = openai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_message}
+            ],
+            temperature=0.7,
+            max_tokens=2000
+        )
+        
+        # Parse the response
+        ai_response = response.choices[0].message.content.strip()
+        
+        # Remove markdown code blocks if present
+        if ai_response.startswith("```"):
+            ai_response = ai_response.split("```")[1]
+            if ai_response.startswith("json"):
+                ai_response = ai_response[4:]
+        if ai_response.endswith("```"):
+            ai_response = ai_response[:-3]
+        
+        import json
+        analysis = json.loads(ai_response.strip())
+        
+        # Calculate processing time
+        processing_time = time.time() - start_time
+        
+        # Calculate tokens used
+        tokens_used = response.usage.total_tokens if response.usage else 0
+        
+        # Generate log ID
+        log_id = f"#{uuid.uuid4().hex[:4].upper()}-{chr(65 + (int(time.time()) % 26))}"
+        
+        # Update metrics in database
+        await db.dashboard_metrics.update_one(
+            {},
+            {
+                "$inc": {"corrections": 1},
+                "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+            },
+            upsert=True
+        )
+        
+        # Save analysis to database
+        analysis_doc = {
+            "id": str(uuid.uuid4()),
+            "log_id": log_id,
+            "error_log": request.error_log,
+            "tags": request.tags,
+            "analysis": analysis,
+            "tokens_used": tokens_used,
+            "processing_time": f"{processing_time:.1f}s",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.error_analyses.insert_one(analysis_doc)
+        
+        return ErrorAnalysisResponse(
+            log_id=log_id,
+            timestamp=datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M"),
+            framework=analysis.get("framework", "Não detectado"),
+            severity=analysis.get("severity", "Média"),
+            tokens_used=tokens_used,
+            processing_time=f"{processing_time:.1f}s",
+            root_cause=analysis.get("root_cause", "Erro Desconhecido"),
+            root_cause_description=analysis.get("root_cause_description", "Não foi possível determinar a causa raiz."),
+            solution=analysis.get("solution", "Não foi possível gerar uma solução."),
+            prompt=analysis.get("prompt", "Não foi possível gerar o prompt.")
+        )
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {e}")
+        raise HTTPException(status_code=500, detail="Erro ao processar resposta da IA")
+    except Exception as e:
+        logger.error(f"Error analyzing error: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro ao analisar: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
